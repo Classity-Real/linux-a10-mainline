@@ -1,0 +1,97 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Samsung Galaxy A10 (a10/SM-A105x) device tree source
+ *
+ * Based on real wiring pulled from Samsung's GPL kernel source
+ * release for SM-A105F (exynos7884B-a10_common.dtsi), cross-checked
+ * against the mainline exynos7885-jackpotlte.dts board file.
+ */
+
+/dts-v1/;
+#include "exynos7885.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+model = "Samsung Galaxy A10 (2019)";
+compatible = "samsung,a10", "samsung,exynos7885";
+chassis-type = "handset";
+
+aliases {
+mmc0 = &mmc_0;
+serial0 = &serial_0;
+serial1 = &serial_1;
+serial2 = &serial_2;
+};
+
+chosen {
+/* UNCONFIRMED: stock defconfig has CONFIG_CMDLINE="" (bootloader-passed),
+ * so this is carried over from jackpotlte as a starting guess.
+ * Verify against real serial boot log once you have UART access. */
+stdout-path = &serial_2;
+};
+
+/* TODO: no explicit memory node found in Samsung's board DT -
+ * it's likely passed by the bootloader per-SKU (2GB/3GB variants exist).
+ * Do NOT guess this - pull it from the actual boot log (early console
+ * output / ATAGS dump) once serial console is working, then fill in here. */
+
+gpio-keys {
+compatible = "gpio-keys";
+pinctrl-names = "default";
+pinctrl-0 = <&key_volup &key_voldown &key_power>;
+
+volup-key {
+label = "Volume Up";
+linux,code = <KEY_VOLUMEUP>;
+gpios = <&gpa1 5 GPIO_ACTIVE_LOW>;
+};
+
+voldown-key {
+label = "Volume Down";
+linux,code = <KEY_VOLUMEDOWN>;
+gpios = <&gpa1 6 GPIO_ACTIVE_LOW>;
+};
+
+power-key {
+label = "Power";
+linux,code = <KEY_POWER>;
+gpios = <&gpa1 7 GPIO_ACTIVE_LOW>;
+wakeup-source;
+};
+};
+};
+
+&oscclk {
+/* Confirmed from exynos7884B-a10_common.dtsi: oscclk compatible
+ * "samsung,exynos7884B-oscclk", clock-frequency 26000000 */
+clock-frequency = <26000000>;
+};
+
+&pinctrl_alive {
+key_volup: key-volup-pins {
+samsung,pins = "gpa1-5";
+samsung,pin-function = <EXYNOS_PIN_FUNC_F>;
+samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
+};
+
+key_voldown: key-voldown-pins {
+samsung,pins = "gpa1-6";
+samsung,pin-function = <EXYNOS_PIN_FUNC_F>;
+samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
+};
+
+key_power: key-power-pins {
+samsung,pins = "gpa1-7";
+samsung,pin-function = <EXYNOS_PIN_FUNC_F>;
+samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
+};
+};
+
+&serial_2 {
+status = "okay";
+};
